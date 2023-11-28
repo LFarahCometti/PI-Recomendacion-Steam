@@ -97,4 +97,4 @@ Se ha alcanzado con éxito la meta de desarrollar un Producto Mínimo Viable (MP
 
 
 ## Autor
-* **Farah Cometti Leopoldo Martin**  
+* **Farah Cometti, Leopoldo Martin**  

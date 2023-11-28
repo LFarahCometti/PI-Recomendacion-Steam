@@ -22,10 +22,10 @@ app = FastAPI()
 
 
 # Dentro del script
-df_games = pd.read_parquet("Datasets/output_steam_games.parquet")
-df_user_items = pd.read_parquet("Datasets/australian_users_items.parquet")
-df_games_and_reviews = pd.read_parquet("Datasets/games_and_reviews.parquet")
-modelo_railway = pd.read_parquet("Datasets/modelo_railway.parquet")
+df_steamgames = pd.read_parquet("dataset_limpio/steam_games.parquet")
+df_users_items = pd.read_parquet("dataset_limpio/items_normalized.parquet")
+df_steamgames_and_reviews = pd.read_parquet("dataset_funciones/steamgames_and_reviews.parquet")
+modelo_railway = pd.read_parquet("dataset_limpio/modelo_railway.parquet")
 
 
 
@@ -64,8 +64,8 @@ async def inicio():
 
 
 # Antes de la definición de la función
-df_user_items['item_id'] = df_user_items['item_id'].astype(str)
-df_games['item_id'] = df_games['item_id'].astype(str)
+df_users_items['item_id'] = df_users_items['item_id'].astype(str)
+df_steamgames['item_id'] = df_steamgames['item_id'].astype(str)
 
 
 @app.get("/playtimegenre/{genero}", name="PLAYTIMEGENRE")
@@ -81,7 +81,7 @@ async def PlayTimeGenre(genero: str) -> str:
     genero = genero.lower()
 
     # Filtramos los juegos por género de manera más flexible
-    df_filtered = df_games[df_games['genres'].str.lower().str.contains(fr'\b{genero}\b', na=False)]
+    df_filtered = df_steamgames[df_steamgames['genres'].str.lower().str.contains(fr'\b{genero}\b', na=False)]
 
     if not df_filtered.empty:
         df_merged = pd.merge(df_user_items, df_filtered[['item_id', 'release_year']], left_on='item_id', right_on='item_id')
@@ -115,15 +115,15 @@ async def UserForGenre(genero: str) -> Dict[str, Union[str, List[Dict[str, Union
     genero = genero.lower()
 
     # Filtramos los juegos por género de manera más flexible
-    df_filtered = df_games[df_games['genres'].str.lower().str.contains(fr'\b{genero}\b', na=False)]
+    df_filtered = df_steamgames[df_steamgames['genres'].str.lower().str.contains(fr'\b{genero}\b', na=False)]
 
     if not df_filtered.empty:
-        df_user_items['item_id'] = df_user_items['item_id'].astype(str)
+        df_users_items['item_id'] = df_users_items['item_id'].astype(str)
 
         # Convertimos la columna 'item_id' en df_filtered a tipo 'str'
         df_filtered['item_id'] = df_filtered['item_id'].astype(str)
 
-        df_merged = pd.merge(df_user_items, df_filtered[['item_id', 'release_year']], on='item_id')
+        df_merged = pd.merge(df_users_items, df_filtered[['item_id', 'release_year']], on='item_id')
 
         # Filtramos los datos desde el año 2003 en adelante
         df_merged = df_merged[df_merged['release_year'] >= 2003]
@@ -170,11 +170,11 @@ def UsersRecommend(año: int):
         return {"message": "Mi base de datos solo tiene registros entre 2010 y 2015"}
 
     # Aquí cargamos el DataFrame
-    df_games_and_reviews = pd.read_parquet("Datasets/games_and_reviews.parquet")
+    df_steamgames_and_reviews = pd.read_parquet("dataset_funciones/steamgames_and_reviews.parquet")
 
     # Filtramos por el año deseado en las fechas de lanzamiento y publicación
-    df_filtered = df_games_and_reviews[
-        (df_games_and_reviews['release_year'] == año)
+    df_filtered = df_steamgames_and_reviews[
+        (df_steamgames_and_reviews['release_year'] == año)
     ]
 
     # Filtramos por comentarios recomendados y sentiment_analysis positivo/neutral
@@ -206,8 +206,8 @@ def UsersWorstDeveloper(anio:int):
         Año (int): Año del que se necesite la consulta
 
     ''' 
-    mascara = (df_games_and_reviews['release_year'] == anio)   
-    df_worst_reviews_3 = df_games_and_reviews[mascara]
+    mascara = (df_steamgames_and_reviews['release_year'] == anio)   
+    df_worst_reviews_3 = df_steamgames_and_reviews[mascara]
     developer_counts = df_worst_reviews_3['developer'].value_counts().head(3)
  
     resultados = []
@@ -235,7 +235,7 @@ async def sentiment_analysis(empresa_desarrolladora: str) -> Union[str, Dict[str
     """
 
     # Filtramos por desarrolladora
-    df_filtered_developer = df_games_and_reviews[df_games_and_reviews['developer'] == empresa_desarrolladora]
+    df_filtered_developer = df_steamgames_and_reviews[df_steamgames_and_reviews['developer'] == empresa_desarrolladora]
 
     # Verificamos que haya datos para la desarrolladora
     if not df_filtered_developer.empty:

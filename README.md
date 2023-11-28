@@ -96,5 +96,5 @@ La ejecución del proyecto se basó en la aplicación de conocimientos adquirido
 Se ha alcanzado con éxito la meta de desarrollar un Producto Mínimo Viable (MPV), que engloba una API junto con su implementación en un servicio web. Aunque se logró cumplir con el objetivo establecido, es esencial destacar que, debido a limitaciones de almacenamiento, en algunos casos se han llevado a cabo procesos básicos. Por ende, existe margen para optimizar aún más las funciones empleadas y obtener resultados más eficientes.
 
 
-## Autor ✒️
+## Autor
 * **Farah Cometti Leopoldo Martin**  
